@@ -50,8 +50,7 @@ base_sample, base_labels = generate_base_sample_with_k_clusters(distribution, di
 sample = generate_random_number_of_points_from_base_sample(base_sample, int(N * .15))
 
 
-kmeans = KMeans().fit(sample)
-
+kmeans = KMeans(make_gif=True).fit(sample)
 
 
 print(kmeans.predict(np.array([[22, 33], [1, 2], [-2, -5], [0, 0]])))

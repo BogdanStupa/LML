@@ -3,6 +3,7 @@ import copy
 
 from mylearn.base import BaseEstimator
 from mylearn.cluster._kmeans_common import _clustering, _inertia, _normalize, _tolerance, _recalculate_centers
+from mylearn.utilities.make_gif_2d_clustered_sample import make_gif_2d_clusterd_sample
 
 
 def kmeans_single(
@@ -10,20 +11,30 @@ def kmeans_single(
         centers,
         max_iter=100,
         verbose=False,
+        make_gif=False,
         tolerance=1e-4
 ):
     labels = np.zeros(shape=(X.shape[0]), dtype=int)
     _clustering(X, labels, centers)
 
+    if make_gif:
+        data_for_gif = [[labels, centers]]
+
     for i in range(max_iter):
         prev_centers = copy.deepcopy(centers)
         _recalculate_centers(X, labels, centers)
         _clustering(X, labels, centers)
+
+        if make_gif:
+            data_for_gif.append([copy.deepcopy(labels), copy.deepcopy(centers)])
         if _tolerance(centers, prev_centers, tolerance):
             break
 
     sample_weight = []
     inertia = _inertia(X, sample_weight, centers, labels)
+
+    if make_gif:
+        make_gif_2d_clusterd_sample(X, centers.shape[0], data_for_gif)
 
     return labels, centers, inertia, i + 1
 
@@ -33,11 +44,12 @@ class KMeans(BaseEstimator):
             self,
             n_clusters=3,
             init="k-means",
-            max_iter=5,
+            max_iter=7,
             n_init=1,
             verbose=False,
             accuracy=0.002,
-            copy_x=True
+            copy_x=True,
+            make_gif=False
     ):
         self.n_clusters = n_clusters
         self.verbose = verbose
@@ -46,6 +58,7 @@ class KMeans(BaseEstimator):
         self.init = init
         self.accuracy = accuracy
         self.copy_x = copy_x
+        self.make_gif = make_gif
 
     def _check_params(self, X):
         pass
@@ -69,7 +82,8 @@ class KMeans(BaseEstimator):
             labels, centers, inertia, n_iter = kmeans_single(
                 X,
                 centers,
-                self.max_iter
+                self.max_iter,
+                make_gif=self.make_gif
             )
 
             # select best inertia
