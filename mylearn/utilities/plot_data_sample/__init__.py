@@ -1,0 +1,2 @@
+from .make_gif_2d_clustered_sample import make_gif_2d_clusterd_sample
+from .plot_clustered_2d_sample import plot_clustered_2d_sample

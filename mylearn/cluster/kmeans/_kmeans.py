@@ -1,9 +1,9 @@
 import numpy as np
 import copy
 
-from mylearn.base import BaseEstimator
-from mylearn.cluster._kmeans_common import _clustering, _inertia, _normalize, _tolerance, _recalculate_centers
-from mylearn.utilities.make_gif_2d_clustered_sample import make_gif_2d_clusterd_sample
+from mylearn.cluster.base_cluster import BaseCluster
+from mylearn.cluster.kmeans._kmeans_common import _clustering, _inertia, _tolerance, _recalculate_centers
+from mylearn.utilities.plot_data_sample.make_gif_2d_clustered_sample import make_gif_2d_clusterd_sample
 
 
 def kmeans_single(
@@ -39,7 +39,9 @@ def kmeans_single(
     return labels, centers, inertia, i + 1
 
 
-class KMeans(BaseEstimator):
+class MyKMeans(BaseCluster):
+    __slots__ = ["n_clusters", "verbose", "max_iter", "n_init", "accuracy", "copy_x", "make_gif", "labels_"]
+
     def __init__(
             self,
             n_clusters=3,
@@ -59,36 +61,31 @@ class KMeans(BaseEstimator):
         self.accuracy = accuracy
         self.copy_x = copy_x
         self.make_gif = make_gif
+        self.labels_ = None
 
     def _check_params(self, X):
         pass
 
     def fit(self, X):
-        X = self._validate_data(
-            X,
-            copy=self.copy_x,
-            order="C"
-        )
         self._check_params(X)
 
         # _normalize(X)
+        centers = None
+        labels = None
 
         for i in range(self.n_init):
             centers = self._init_centers(X)
-
             if self.verbose:
                 print("Initialization complete")
-
             labels, centers, inertia, n_iter = kmeans_single(
                 X,
                 centers,
                 self.max_iter,
                 make_gif=self.make_gif
             )
-
             # select best inertia
         self.centers = centers
-        self.labels = labels
+        self.labels_ = labels
         return self
 
     def predict(self, X):
@@ -113,4 +110,4 @@ class KMeans(BaseEstimator):
         return self.centers
 
     def get_labels(self):
-        return self.labels
+        return self.labels_

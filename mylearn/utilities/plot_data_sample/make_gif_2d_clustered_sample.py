@@ -30,7 +30,7 @@ def make_gif_2d_clusterd_sample(X, n_clusters, data_for_gif):
             ax.scatter(SX[j], SY[j], s=50)
 
         for j in range(n_clusters):
-            ax.scatter(CX[j], CY[j], s=130, c='r', marker='^')
+            ax.scatter(CX[j], CY[j], s=130, c='r', marker='*')
 
         fig.savefig(fname)
         plt.close()
