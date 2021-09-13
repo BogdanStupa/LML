@@ -18,7 +18,6 @@ def test_clustering_with_circle_data(
         raise TypeError("cluster must be subclass of BaseCluster")
     X_data_circles = generate_n_circles(radiuses=radiuses, noises=noises, number_of_points=150) + center
     plot_clustered_2d_sample(X_data_circles)
-
     spectral_clustering = cluster(n_clusters=radiuses.shape[0]).fit(X_data_circles)
     plot_clustered_2d_sample(X_data_circles, spectral_clustering.labels_)
 
@@ -41,7 +40,12 @@ def test_clustering_with_normal_distribution_data(
     base_sample, base_labels = generate_base_sample_with_k_clusters(distribution, dimension, number_of_points_in_one_cluster)
     plot_clustered_2d_sample(base_sample)
 
+    base_sample  = np.array([ [15, 131, 154],
+     [160, 130, 153],
+     [176, 130, 153]])
+
     spectral_clustering = cluster(n_clusters=distribution.shape[0]).fit(base_sample)
+    print(spectral_clustering.labels_)
     plot_clustered_2d_sample(base_sample, spectral_clustering.labels_)
 
 

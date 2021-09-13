@@ -9,12 +9,13 @@ from mylearn.utilities.plot_data_sample.make_gif_2d_clustered_sample import make
 def kmeans_single(
         X,
         centers,
-        max_iter=100,
+        max_iter=10,
         verbose=False,
         make_gif=False,
         tolerance=1e-4
 ):
     labels = np.zeros(shape=(X.shape[0]), dtype=int)
+    print("KMEANS_Single")
     _clustering(X, labels, centers)
 
     if make_gif:
@@ -38,6 +39,12 @@ def kmeans_single(
 
     return labels, centers, inertia, i + 1
 
+
+def check_on_similirity(set_of_idx, idx, X):
+    for i in set_of_idx:
+        if np.all(X[idx] == X[i]):
+            return False
+    return True
 
 class MyKMeans(BaseCluster):
     __slots__ = ["n_clusters", "verbose", "max_iter", "n_init", "accuracy", "copy_x", "make_gif", "labels_"]
@@ -75,6 +82,7 @@ class MyKMeans(BaseCluster):
 
         for i in range(self.n_init):
             centers = self._init_centers(X)
+            print("wfwf", centers)
             if self.verbose:
                 print("Initialization complete")
             labels, centers, inertia, n_iter = kmeans_single(
@@ -95,15 +103,16 @@ class MyKMeans(BaseCluster):
         return labels
 
     def _init_centers(self, X):
-        set_of_idx = set()
+        set_of_idx = []
         k = 1
         centers = np.ndarray(shape=(self.n_clusters, X.shape[-1]))
         while k <= self.n_clusters:
             idx = np.random.randint(X.shape[0])
-            if idx not in set_of_idx:
-                set_of_idx.add(idx)
+            if idx not in set_of_idx and check_on_similirity(set_of_idx, idx, X):
+                set_of_idx.append(idx)
                 centers[k - 1] = X[idx]
                 k += 1
+        print("HERERE", centers, set_of_idx)
         return centers
 
     def get_centers(self):

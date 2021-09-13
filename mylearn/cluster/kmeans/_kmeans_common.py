@@ -1,7 +1,9 @@
 import numpy as np
-
+# np.seterr(divide='ignore', invalid='ignore')
 
 def _clustering(X, labels, centers):
+    print("KMEANS_Clusterin1", X.shape)
+    print("cefe", centers)
     for i, point in enumerate(X):
         last_min_distance = np.inf
         for j, centroid in enumerate(centers):
@@ -9,6 +11,8 @@ def _clustering(X, labels, centers):
             if current_distance < last_min_distance:
                 last_min_distance = current_distance
                 labels[i] = j + 1
+    print("KMEANS_Clusterin2")
+
 
 
 def _normalize(X):
@@ -32,6 +36,7 @@ def _normalize(X):
 def _recalculate_centers(X, labels, centers):
     for i in range(centers.shape[0]):
         centers[i] = np.sum(X[labels == i + 1], axis=0) / labels[labels == i + 1].shape[0]
+        print(centers[i], labels[labels == i + 1].shape[0])
 
 
 def _tolerance(centers, prev_centers, tolerance):
