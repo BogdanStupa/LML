@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import os
 import argparse
 
 from sobel import sobel_edge_detection
@@ -66,70 +67,29 @@ def threshold(image, low, high, weak, verbose=False):
     return output
 
 
+
+def set_edges(image, weak, row_range, col_range):
+    g_im = image.copy()
+    moves = [[0, 1], [0, -1], [-1, 0], [1, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]]
+    for row in row_range:
+        for col in col_range:
+            if g_im[row, col] == weak:
+                isOk = False
+                for move in moves:
+                    if g_im[row + move[0], col + move[1]] == 255:
+                        isOk = True
+                g_im[row, col] = 255 if isOk else 0
+    return g_im
+
 def hysteresis(image, weak):
     image_row, image_col = image.shape
 
-    top_to_bottom = image.copy()
-
-    for row in range(1, image_row):
-        for col in range(1, image_col):
-            if top_to_bottom[row, col] == weak:
-                if top_to_bottom[row, col + 1] == 255 or top_to_bottom[row, col - 1] == 255 or top_to_bottom[
-                    row - 1, col] == 255 or \
-                        top_to_bottom[row + 1, col] == 255 or top_to_bottom[row - 1, col - 1] == 255 or top_to_bottom[
-                    row + 1, col - 1] == 255 or top_to_bottom[row - 1, col + 1] == 255 or top_to_bottom[
-                    row + 1, col + 1] == 255:
-                    top_to_bottom[row, col] = 255
-                else:
-                    top_to_bottom[row, col] = 0
-
-    bottom_to_top = image.copy()
-
-    for row in range(image_row - 1, 0, -1):
-        for col in range(image_col - 1, 0, -1):
-            if bottom_to_top[row, col] == weak:
-                if bottom_to_top[row, col + 1] == 255 or bottom_to_top[row, col - 1] == 255 or bottom_to_top[
-                    row - 1, col] == 255 or bottom_to_top[
-                    row + 1, col] == 255 or bottom_to_top[
-                    row - 1, col - 1] == 255 or bottom_to_top[row + 1, col - 1] == 255 or bottom_to_top[
-                    row - 1, col + 1] == 255 or bottom_to_top[
-                    row + 1, col + 1] == 255:
-                    bottom_to_top[row, col] = 255
-                else:
-                    bottom_to_top[row, col] = 0
-
-    right_to_left = image.copy()
-
-    for row in range(1, image_row):
-        for col in range(image_col - 1, 0, -1):
-            if right_to_left[row, col] == weak:
-                if right_to_left[row, col + 1] == 255 or right_to_left[row, col - 1] == 255 or right_to_left[
-                    row - 1, col] == 255 or right_to_left[
-                    row + 1, col] == 255 or right_to_left[
-                    row - 1, col - 1] == 255 or right_to_left[row + 1, col - 1] == 255 or right_to_left[
-                    row - 1, col + 1] == 255 or right_to_left[
-                    row + 1, col + 1] == 255:
-                    right_to_left[row, col] = 255
-                else:
-                    right_to_left[row, col] = 0
-
-    left_to_right = image.copy()
-
-    for row in range(image_row - 1, 0, -1):
-        for col in range(1, image_col):
-            if left_to_right[row, col] == weak:
-                if left_to_right[row, col + 1] == 255 or left_to_right[row, col - 1] == 255 or left_to_right[
-                    row - 1, col] == 255 or left_to_right[
-                    row + 1, col] == 255 or left_to_right[
-                    row - 1, col - 1] == 255 or left_to_right[row + 1, col - 1] == 255 or left_to_right[
-                    row - 1, col + 1] == 255 or left_to_right[
-                    row + 1, col + 1] == 255:
-                    left_to_right[row, col] = 255
-                else:
-                    left_to_right[row, col] = 0
+    top_to_bottom = set_edges(image, weak, range(1, image_row), range(1, image_col))
+    bottom_to_top = set_edges(image, weak, range(image_row - 1, 0, -1), range(image_col - 1, 0, -1))
+    right_to_left = set_edges(image, weak, range(1, image_row), range(image_col - 1, 0, -1))
+    left_to_right = set_edges(image, weak, range(image_row - 1, 0, -1), range(1, image_col))
 
     final_image = top_to_bottom + bottom_to_top + right_to_left + left_to_right
-
     final_image[final_image > 255] = 255
 
     return final_image
@@ -141,7 +101,10 @@ if __name__ == '__main__':
     ap.add_argument("-v", "--verbose", type=bool, default=False, help="Path to the image")
     args = vars(ap.parse_args())
 
-    image = cv2.imread(args["image"])
+    image = cv2.imread("/home/bogdan/Main/4course/practice/machine_learning/computer_vision/edge_detection/images/1.png")
+
+    if image is None:
+        raise ValueError("Image is none")
 
     blurred_image = gaussian_blur(image, kernel_size=9, verbose=False)
 

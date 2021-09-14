@@ -15,7 +15,6 @@ def kmeans_single(
         tolerance=1e-4
 ):
     labels = np.zeros(shape=(X.shape[0]), dtype=int)
-    print("KMEANS_Single")
     _clustering(X, labels, centers)
 
     if make_gif:
@@ -82,7 +81,6 @@ class MyKMeans(BaseCluster):
 
         for i in range(self.n_init):
             centers = self._init_centers(X)
-            print("wfwf", centers)
             if self.verbose:
                 print("Initialization complete")
             labels, centers, inertia, n_iter = kmeans_single(
@@ -112,7 +110,6 @@ class MyKMeans(BaseCluster):
                 set_of_idx.append(idx)
                 centers[k - 1] = X[idx]
                 k += 1
-        print("HERERE", centers, set_of_idx)
         return centers
 
     def get_centers(self):
