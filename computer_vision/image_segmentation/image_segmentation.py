@@ -1,5 +1,6 @@
 import cv2
 import argparse
+import numpy as np
 # from mylearn.cluster import MySpectralClustering
 from mylearn.cluster import MyKMeans
 
@@ -13,7 +14,10 @@ if __name__ == "__main__":
     image = cv2.imread(args["image"])
     (h1, w1) = image.shape[:2]
 
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+    image1 = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+
+    if np.all(image - image1):
+        print("efwefewf")
 
     image = image.reshape((image.shape[0] * image.shape[1], 3))
     clt = MyKMeans(n_clusters=args["n_clusters"]).fit(image)

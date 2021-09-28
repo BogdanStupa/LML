@@ -26,4 +26,5 @@ def gaussian_kernel(size, sigma=1, verbose=False):
 
 def gaussian_blur(image, kernel_size, verbose=False):
     kernel = gaussian_kernel(kernel_size, sigma=int(math.sqrt(kernel_size)), verbose=verbose)
+    # print("kernel")
     return convolution(image, kernel, average=True, verbose=verbose)
